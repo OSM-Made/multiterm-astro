@@ -2,7 +2,7 @@
 avatarImage:
   src: './avatar.jpg'
   alt: 'My avatar'
-githubCalendar: 'stelcodes'
+githubCalendar: 'OSM-Made'
 ---
 
-Welcome to the example site. This site is meant to show off my custom Astro theme/template **MultiTerm** which creates a coder-ready blog complete with an interactive theme changer, RSS, sitemap, tagging, and markdown extensions.
+**Hi, I'm Greg!** This is my personal blog where I document my work in **reverse engineering protected systems**, **building custom tooling**, and **unlocking undocumented behaviors** across platforms like PS4, Android, and beyond. 
