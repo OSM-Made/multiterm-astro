@@ -3,7 +3,7 @@ title: 'PS4 RetailKit Part 2: Mdbg Investigation'
 published: 2025-07-4
 draft: false
 series: 'PS4 RetailKit'
-tags: [ 'RetailKit', 'PS4', 'Debugger', 'DECI']
+tags: [ 'RetailKit', 'PS4', 'Debugger', 'DECI', 'Reverse Engineering']
 toc: true
 ---
 

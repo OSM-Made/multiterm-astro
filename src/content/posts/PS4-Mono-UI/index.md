@@ -3,7 +3,7 @@ title: 'PS4 Mono UI'
 published: 2021-04-14
 draft: false
 series: 'PS4 Mono'
-tags: [ 'Mono', 'PS4', 'SceShellUI', 'MonoInterop']
+tags: [ 'Mono', 'PS4', 'SceShellUI', 'MonoInterop', 'Reverse Engineering']
 toc: true
 ---
 

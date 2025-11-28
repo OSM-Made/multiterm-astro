@@ -10,6 +10,8 @@ const config: SiteConfig = {
     'Hi, I\'m Greg! This is my personal blog where I document my work in reverse engineering protected systems, building custom tooling, and unlocking undocumented behaviors across platforms like PS4, Android, and beyond.',
   // The author of the site, used in the footer, SEO, and RSS feed.
   author: 'Gregory Greekas',
+  // The footer text
+  footer: 'The views, thoughts, and opinions expressed on this blog are solely my own and do not reflect the views, policies, or positions of my employer or any organization I am affiliated with. All research and commentary provided here is for informational purposes only.',
   // Keywords for SEO, used in the meta tags.
   tags: ['Astro', 'Terminal', 'Theme', 'MultiTerm', 'stelcodes'],
   // Path to the image used for generating social media previews.

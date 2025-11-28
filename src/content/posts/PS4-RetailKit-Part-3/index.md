@@ -3,7 +3,7 @@ title: 'PS4 RetailKit Part 3: DECI Daemon'
 published: 2025-09-25
 draft: false
 series: 'PS4 RetailKit'
-tags: [ 'RetailKit', 'PS4', 'Debugger', 'DECI']
+tags: [ 'RetailKit', 'PS4', 'Debugger', 'DECI', 'Reverse Engineering']
 toc: true
 ---
 
