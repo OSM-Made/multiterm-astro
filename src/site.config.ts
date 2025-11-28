@@ -13,7 +13,7 @@ const config: SiteConfig = {
   // The footer text
   footer: 'The views, thoughts, and opinions expressed on this blog are solely my own and do not reflect the views, policies, or positions of my employer or any organization I am affiliated with. All research and commentary provided here is for informational purposes only.',
   // Keywords for SEO, used in the meta tags.
-  tags: ['Astro', 'Terminal', 'Theme', 'MultiTerm', 'stelcodes'],
+  tags: ['PS4', 'PS5', 'Reverse Engineering', 'Jailbreak', 'DECI', 'Debugger', 'SceShellUI', 'SceShellCore', 'SceSysCore', 'Gregory Greekas', 'Hacking Adventures', 'Playstation', 'Homebrew' ],
   // Path to the image used for generating social media previews.
   // Needs to be a square JPEG file due to limitations of the social card generator.
   // Try https://squoosh.app/ to easily convert images to JPEG.
