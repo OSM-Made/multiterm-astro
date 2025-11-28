@@ -172,10 +172,10 @@ const config: SiteConfig = {
   // IMPORTANT: Update giscus.json in the root of the project with your own website URL
   // If you don't want to use Giscus, set this to undefined.
   giscus: {
-    repo: 'stelcodes/multiterm-astro',
-    repoId: 'R_kgDOPNnBig',
-    category: 'Giscus',
-    categoryId: 'DIC_kwDOPNnBis4CteOc',
+    repo: 'OSM-Made/multiterm-astro',
+    repoId: 'R_kgDOQeX74A',
+    category: 'General',
+    categoryId: 'DIC_kwDOQeX74M4CzJIM',
     reactionsEnabled: true, // Enable reactions on post itself
   },
   // These are characters available for the character chat feature.
