@@ -50,7 +50,8 @@
     "satori-html": "^0.3.2",
     "tailwindcss": "^4.1.13",
     "typescript": "^5.9.2",
-    "unified": "^11.0.5"
+    "unified": "^11.0.5",
+    "wrangler": "^4.51.0"
   },
   "devDependencies": {
     "@types/markdown-it": "^14.1.2",
