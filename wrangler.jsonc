@@ -3,5 +3,11 @@
   "compatibility_date": "2025-11-28", 
   "assets": {
     "directory": "./dist"
-  }
+  },
+  "routes": [
+    {
+      "pattern": "hackingadventures.ca",
+      "custom_domain": true
+    }
+  ]
 }
