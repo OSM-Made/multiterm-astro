@@ -1,5 +1,5 @@
 ---
-title: "Manually Porting the PS4 Visual Studio Integration to VS 2026"
+title: "Manually Porting the PS4 VS Integration to VS 2026"
 published: 2025-11-29
 draft: false
 tags: [ 'PS4', 'Reverse Engineering', 'Visual Studio']
