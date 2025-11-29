@@ -129,3 +129,10 @@ catch {
 
 Write-Host "`nMigration Complete!" -ForegroundColor Green
 ```
+
+## Credits
+Special thank you to the following for their assistance.
+
+[Faultz](https://github.com/Faultz): For figuring out you can just downgrade the `Microsoft.Build.CPPTasks.Common.Base.dll`.
+
+[Synful](https://github.com/Synful): For finding the templates.
