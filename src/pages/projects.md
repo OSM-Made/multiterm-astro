@@ -20,7 +20,7 @@ Paired with Aether Hub built using Avalonia, a powerful UI for managing targets,
 
 The next version of Orbis Suite completely rewritten with a new UI. Now running mostly in userland on the PS4 with its own Daemon process gone is the need for a payload! Fully featured suite of tools to help aid in developing and debugging on the PS4 console. Kind of skipped a version I had worked on at the end of 2021 since I had decided to port this project to WPF from Winforms.
 
-<a href="https://github.com/OSM-Made/Orbis-Suite-3.0">
+<a href="https://github.com/OSM-Made/Orbis-Suite">
   <button>Learn More</button>
 </a>
 
