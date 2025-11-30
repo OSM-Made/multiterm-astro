@@ -1,5 +1,5 @@
 ---
-title: "Reverse Engineering Playstions App Messaging IPC"
+title: "Reverse Engineering Playstations App Messaging IPC"
 published: 2025-11-30
 draft: false
 tags: [ 'PS4', 'Reverse Engineering', 'App Messaging', 'IPC', 'SceShellCore', 'SceShellUI']
