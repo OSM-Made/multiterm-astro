@@ -38,8 +38,7 @@ Alternatively you could decompile the platform libraries and recompile them with
 ## Auto Port Script
 Since I am lazy I also created the following script you can use that should automatically port the VS integration.
 
-**Usage Example:**
-```powershell
+```powershell title="Usage Example"
 .\Migrate-PS4-VS-Integration.ps1 -VS2022Path "C:\Program Files\Microsoft Visual Studio\2022\Community" -VS2026Path "C:\Program Files\Microsoft Visual Studio\18\Community"
 ```
 
