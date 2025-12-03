@@ -96,6 +96,4 @@ export default defineConfig({
   experimental: {
     contentIntellisense: true,
   },
-
-  adapter: cloudflare(),
 })
