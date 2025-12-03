@@ -18,10 +18,11 @@ import ChevronsRight from '~/icons/chevrons-right.svg'
 import { getPostSequenceContext } from '~/utils'
 
 export const getStaticPaths = (async () => {
-  const posts = await getSortedPosts()
+  const sortedPosts = await getSortedPosts()
+  const posts = await getCollection('posts')
   return posts.map((post) => {
     // Get sequence context for the post
-    const { prev, next } = getPostSequenceContext(post, posts)
+    const { prev, next } = getPostSequenceContext(post, sortedPosts)
     return {
       params: { slug: post.id },
       props: { post, prev, next },
