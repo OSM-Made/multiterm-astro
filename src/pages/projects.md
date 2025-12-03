@@ -14,6 +14,14 @@ Paired with Aether Hub built using Avalonia, a powerful UI for managing targets,
   <button>Learn More</button>
 </a>
 
+## StubMaker
+
+Windows improvement of flatz's PS4 stub library maker. Creates linkable stub libraries that expose undocumented functions and internal APIs not available in the official PS4 SDK. Supports both standard and packed .prx formats where multiple libraries are combined into a single module.
+
+<a href="https://github.com/OSM-Made/StubMaker">
+  <button>Learn More</button>
+</a>
+
 ## Orbis Suite 3.0
 
 ![](../content/OrbisSuite3.png)
