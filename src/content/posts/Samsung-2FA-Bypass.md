@@ -57,7 +57,7 @@ The vulnerability started with Samsung's 2FA request API:
 POST https://us-auth2.samsungosp.com/v2/profile/user/2factor/authentication/request
 ```
 
-This endpoint is designed to send a 2FA code to a user's trusted devices. The only required input was the account username—no authentication, no session token, nothing. 
+This endpoint is designed to send a 2FA code to a user's trusted devices. The only required input was the account username.
 
 The problem was the response. When requesting a code be sent to trusted devices, the API returned detailed information about every trusted device on the account:
 ```csharp
@@ -125,7 +125,7 @@ This vulnerability chain had severe implications:
 
 ### Information Disclosure at Scale
 
-The unauthenticated 2FA request endpoint could be queried for any Samsung Account username. An attacker could harvest sensitive device information across thousands of accounts without ever triggering a login attempt or alert. 
+The unauthenticated 2FA request endpoint could be queried for any Samsung Account username. An attacker could harvest sensitive device information across thousands of accounts without ever triggering a login attempt or alert beyond the 2FA code. 
 
 The leaked data included:
 - **IMEI**: Uniquely identifies a device, can be used for tracking or fraud.
@@ -145,7 +145,7 @@ The attacker could:
 - Modify account security settings, potentially locking out the legitimate user.
 
 :::note
-This bypass specifically affected accounts using Samsung's "trusted device" 2FA method rather than SMS-based verification. However, trusted device is the default and more convenient option and likely the majority of users with 2FA enabled.
+This bypass specifically affected accounts using Samsung's "trusted device" 2FA method rather than SMS based verification. However, trusted device is the default and more convenient option and likely the majority of users with 2FA enabled.
 :::
 
 ### Why Samsung Rated This High Severity
@@ -158,7 +158,7 @@ This bypass specifically affected accounts using Samsung's "trusted device" 2FA 
 ## Lessons Learned
 
 ### The Disclosure Process
-Samsung's security team was responsive and professional. Reports were acknowledged quickly and updates came at reasonable intervals, though communication was fairly clinical/straightforward status updates rather than back-and-forth discussion. The vulnerability was confirmed and patched within two months, which is a solid turnaround for a major vendor.
+Samsung's security team was responsive and professional. Reports were acknowledged quickly and updates came at reasonable intervals, though communication was fairly clinical or straightforward status updates rather than back-and-forth discussion. The vulnerability was confirmed and patched within two months, which is a solid turnaround for a major vendor.
 
 Samsung awarded a cash bounty for this report. No CVE was assigned, which is typical most organizations reserve CVEs for remote code execution or similarly critical classes of bugs rather than authentication bypasses.
 
