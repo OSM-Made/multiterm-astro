@@ -7,7 +7,7 @@ const config: SiteConfig = {
   title: 'Hacking Adventures',
   // The description of your site, used for SEO and RSS feed.
   description:
-    'Hi, I\'m Greg! This is my personal blog where I document my work in reverse engineering protected systems, building custom tooling, and unlocking undocumented behaviors across platforms like PS4, Android, and beyond.',
+    'I\'m Greg, a Senior Reverse Engineer who hunts for security vulnerabilities in protected systems and documents unknown system internals. This is where I walk through my research from security flaws and low-level analysis to building tools for the PlayStation homebrew community.',
   // The author of the site, used in the footer, SEO, and RSS feed.
   author: 'Gregory Greekas',
   // The footer text
