@@ -33,6 +33,12 @@ From there, the attacker receives full authentication tokens and access to the v
 - Sensitive identifiers (IMEIs, phone numbers, IP addresses) should never be exposed without authentication.
 - A secure system can be completely undermined by a single chatty endpoint.
 
+### Responsible Disclosure Note
+
+:::important
+This writeup describes a vulnerability that has been **fully patched** by Samsung as of December 2024. All technical details shared here are for educational purposes and to help other researchers understand common API security pitfalls. The vulnerability is no longer exploitable on current Samsung Account systems.
+:::
+
 ## Background & Discovery
 I stumbled onto this vulnerability while inspecting network traffic on my own Samsung device using [HTTP Toolkit](https://httptoolkit.com/). I noticed something odd: when triggering a 2FA request, the API response contained a surprising amount of data about my device and account **BEFORE** I had even authenticated.
 
@@ -49,12 +55,6 @@ Using [Jadx](https://github.com/skylot/jadx) to decompile Samsung's Android apps
 That was the moment it clicked: the API was leaking the IMEI, and the IMEI was all I needed to generate a valid `deviceUniqueId`. The trusted device check could be completely bypassed using information the API freely handed out.
 
 ## Technical Deep-Dive
-
-### Responsible Disclosure Note
-
-:::important
-This writeup describes a vulnerability that has been **fully patched** by Samsung as of December 2024. All technical details shared here are for educational purposes and to help other researchers understand common API security pitfalls. The vulnerability is no longer exploitable on current Samsung Account systems.
-:::
 
 ### The Leaky Endpoint
 
