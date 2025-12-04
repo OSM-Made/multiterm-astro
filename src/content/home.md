@@ -5,4 +5,4 @@ avatarImage:
 githubCalendar: 'OSM-Made'
 ---
 
-**Hi, I'm Greg!** This is my personal blog where I document my work in **reverse engineering protected systems**, **building custom tooling**, and **unlocking undocumented behaviors** across platforms like PS4, Android, and beyond. 
+I'm Greg, a Senior Reverse Engineer who hunts for security vulnerabilities in protected systems and documents unknown system internals. This is where I walk through my research from security flaws and low-level analysis to building tools for the PlayStation homebrew community.

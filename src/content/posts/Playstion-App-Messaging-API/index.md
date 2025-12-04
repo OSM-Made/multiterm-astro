@@ -167,7 +167,7 @@ The second arg passed into the IPMI send message function is the request index. 
 
 The code here is a bit complex but it gives us a picture of the path the data takes to get to our destination.
 
-``` Title="Message Flow"
+```txt Title="Message Flow"
 Sender -> Kernel(IPMI) -> ShellCore -> ... -> Receiver
 ```
 
