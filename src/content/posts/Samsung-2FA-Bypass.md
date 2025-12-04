@@ -1,7 +1,7 @@
 ---
 title: "How I Found a High-Severity 2FA Bypass in Samsung Accounts."
 published: 2025-12-03
-draft: true
+draft: false
 tags: [ 'Security Research', 'Responsible Disclosure', 'Authentication Bypass', 'Samsung', '2FA' ]
 toc: true
 ---
