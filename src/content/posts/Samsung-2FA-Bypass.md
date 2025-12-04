@@ -8,7 +8,7 @@ toc: true
 
 ## Summary
 
-In 2024, I discovered a high-severity vulnerability in Samsung Account's two-factor authentication system that allowed an attacker to completely bypass 2FA protections on any account. This was my first responsible disclosure to a major vendor.
+In 2024, I discovered a high-severity vulnerability in Samsung Account's two-factor authentication system that allowed an attacker to completely bypass 2FA protections on any account. This was my first major vulnerability disclosure, and Samsung responded professionally with a fix deployed within 8 weeks.
 
 **The core issue:** Samsung's 2FA request API disclosed sensitive device information including IMEIs and phone numbers to anyone who knew a victim's username. No authentication required. That leaked IMEI could then be transformed into a "trusted device" identifier allowing an attacker with the victim's password to authenticate as if they were using the victim's phone.
 
@@ -16,7 +16,7 @@ In 2024, I discovered a high-severity vulnerability in Samsung Account's two-fac
 ```
 > Please Enter the account username...
 victim@email.com
-> Leaked device Found: Galaxy S21 Ultra IMEI: 123456789012345 IP: 1.1.1.100
+> Leaked device Found: Galaxy S21 Ultra IMEI: [REDACTED] IP: 192.0.2.100
 > Please Enter the account password...
 ```
 
@@ -25,8 +25,8 @@ From there, the attacker receives full authentication tokens and access to the v
 **Impact:** This vulnerability was confirmed as high severity by Samsung's security team. It affected Samsung Account and Samsung Cloud globally, was scalable across any number of accounts, and fundamentally undermined the security model that 2FA is supposed to provide. Samsung patched the vulnerability in December of 2024.
 
 ### Disclosure Timeline
-- **October 2024**: Reported to Samsung Security
-- **December 2024**: Fix confirmed deployed
+- **October 2024**: Vulnerability discovered and reported to [Samsung Security](https://security.samsungmobile.com/main.smsb)
+- **December 2024**: Fix confirmed deployed globally (~8-week turnaround)
 
 ### Key takeaways
 - Unauthenticated API endpoints should return the absolute minimum information necessary.
@@ -49,6 +49,12 @@ Using [Jadx](https://github.com/skylot/jadx) to decompile Samsung's Android apps
 That was the moment it clicked: the API was leaking the IMEI, and the IMEI was all I needed to generate a valid `deviceUniqueId`. The trusted device check could be completely bypassed using information the API freely handed out.
 
 ## Technical Deep-Dive
+
+### Responsible Disclosure Note
+
+:::important
+This writeup describes a vulnerability that has been **fully patched** by Samsung as of December 2024. All technical details shared here are for educational purposes and to help other researchers understand common API security pitfalls. The vulnerability is no longer exploitable on current Samsung Account systems.
+:::
 
 ### The Leaky Endpoint
 
