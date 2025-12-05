@@ -29,7 +29,7 @@ You may need to adjust this path depending on the version you have installed, fo
 3. Copy the template `.vstman` from `"$(VS_2022_PATH)\Common7\IDE\ProjectTemplates\PS4Templates.Project..vstman"` to `"$(VS_2026_PATH)\Common7\IDE\ProjectTemplates\PS4Templates.Project..vstman"`.
 4. Copy the build platform from `"$(VS_2022_PATH)\MSBuild\Microsoft\VC\v170\Platforms\ORBIS"` to `"$(VS_2026_PATH)\MSBuild\Microsoft\VC\v180\Platforms\ORBIS"`.
 5. Because this platform is for VS17 you will need to copy the `"Microsoft.Build.CPPTasks.Common.Base.dll"` from `"$(VS_2026_PATH)\MSBuild\Microsoft\VC\v170"` to `"$(VS_2026_PATH)\MSBuild\Microsoft\VC\v180"`.
-6. Run the following command from an admin command prompt `"$(VS_2026_PATH)\Common7\IDE\devenv.exe /update"` to refresh the extensions & templates. 
+6. Run the following command from an admin command prompt `"$(VS_2026_PATH)\Common7\IDE\devenv.exe /setup"` to refresh the extensions & templates. 
 
 :::note
 Alternatively you could decompile the platform libraries and recompile them with the *v18* references rather than using the older *v17* `Microsoft.Build.CPPTasks.Common.Base.dll`.
