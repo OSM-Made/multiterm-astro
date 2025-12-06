@@ -319,9 +319,9 @@ As I was testing I noticed that the timestamp was weird so I dug into the `SceSh
 
 ```c++ Title="ShellCore fetching the time"
 SceKernelTimespec time;
-sceKernelClockGettime(4, time);
+sceKernelClockGettime(4, &time);
 
-auto timeStamp = 1000000 * realtimeSpec.tv_sec + realtimeSpec.tv_nsec / 1000;
+auto timeStamp = 1000000 * time.tv_sec + time.tv_nsec / 1000;
 ```
 
 Here we can see a few things for the reason the timestamp is weird. This method is converting the time in seconds to micro seconds & the interesting choice here is actually the first argument of `sceKernelClockGettime()` which is the `ClockType` and `4` corresponds to `SCE_KERNEL_CLOCK_MONOTONIC` which means the number of seconds since the system booted.
