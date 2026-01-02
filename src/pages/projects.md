@@ -3,6 +3,13 @@ layout: '~/layouts/MarkdownLayout.astro'
 title: Projects
 ---
 
+## Fusion
+Fusion is a minimal kernel utility designed for PlayStation 4 research and development. It maintains a small kernel footprint while exposing essential kernel functionality to userland through a daemon and driver interface. By keeping the kernel layer minimal and offloading logic to userland processes, Fusion enables safer experimentation and development on jailbroken PS4 systems.
+
+<a href="https://github.com/AetherPS/Fusion">
+  <button>Learn More</button>
+</a>
+
 ## Aether
 
 ![](../content/Aether.Hub.png)
