@@ -1,4 +1,5 @@
 // @ts-check
+import { readFileSync } from 'node:fs'
 import { defineConfig } from 'astro/config'
 import tailwindcss from '@tailwindcss/vite'
 import sitemap from '@astrojs/sitemap'
@@ -23,6 +24,15 @@ import remarkMath from 'remark-math'/* for latex math support */
 import rehypeKatex from 'rehype-katex'/* again, for latex math support */
 import remarkGemoji from './src/plugins/remark-gemoji'/* for shortcode emoji support */
 import rehypePixelated from './src/plugins/rehype-pixelated'
+import remarkMermaidPassthrough from './src/plugins/remark-mermaid-passthrough'/* Bypass expressive-code for ```mermaid blocks */
+import rehypeMermaid from 'rehype-mermaid'/* Build-time mermaid → SVG */
+import rehypeStripMermaidFontface from './src/plugins/rehype-strip-mermaid-fontface'/* Drop bulky @font-face from mermaid SVG <style> after build */
+
+const jetbrainsMonoDataUri =
+  'data:font/woff2;base64,' +
+  readFileSync(
+    './node_modules/@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2'
+  ).toString('base64')
 import cloudflare from '@astrojs/cloudflare';
 /* Custom plugin to handle pixelated images */
 
@@ -43,6 +53,7 @@ export default defineConfig({
       remarkUnknownDirectives,
       remarkMath,
       remarkGemoji,
+      remarkMermaidPassthrough,
     ],
     rehypePlugins: [
       [rehypeHeadingIds, { headingIdCompat: true }],
@@ -58,6 +69,74 @@ export default defineConfig({
       rehypeUnwrapImages,
       rehypePixelated,
       rehypeKatex,
+      [
+        rehypeMermaid,
+        {
+          strategy: 'inline-svg',
+          mermaidConfig: {
+            theme: 'base',
+            flowchart: { padding: 16, wrappingWidth: 400 },
+            themeVariables: {
+              fontFamily: '"JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace',
+            },
+            themeCSS: `
+              @font-face {
+                font-family: 'JetBrains Mono Variable';
+                font-style: normal;
+                font-weight: 100 800;
+                font-display: block;
+                src: url('${jetbrainsMonoDataUri}') format('woff2-variations');
+              }
+              .node rect, .node polygon, .node circle, .node ellipse, .node path {
+                fill: color-mix(in oklab, var(--theme-foreground) 5%, transparent) !important;
+                stroke: var(--theme-accent) !important;
+                stroke-width: 1.5px !important;
+              }
+              .node .label, .nodeLabel, .nodeLabel p {
+                color: var(--theme-foreground) !important;
+                fill: var(--theme-foreground) !important;
+              }
+              /* Don't clip if display-time text is slightly wider than build-time measurement.
+                 Center the inner div on the foreignObject's midpoint so any overflow spreads
+                 symmetrically left/right rather than only to the right. */
+              .node foreignObject {
+                overflow: visible !important;
+              }
+              .node foreignObject > div {
+                display: inline-block !important;
+                position: relative !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                width: max-content !important;
+                max-width: none !important;
+                white-space: nowrap !important;
+              }
+              .nodeLabel, .nodeLabel p {
+                white-space: nowrap !important;
+              }
+              .edgePath .path, .flowchart-link {
+                stroke: color-mix(in oklab, var(--theme-foreground) 60%, transparent) !important;
+                stroke-width: 1.5px !important;
+              }
+              .edgeLabel, .edgeLabel p, .edgeLabel rect {
+                background-color: var(--theme-background) !important;
+                color: var(--theme-foreground) !important;
+                fill: var(--theme-background) !important;
+              }
+              .edgeLabel foreignObject div {
+                background-color: var(--theme-background) !important;
+                color: var(--theme-foreground) !important;
+              }
+              .arrowMarkerPath, marker path, defs path {
+                fill: color-mix(in oklab, var(--theme-foreground) 60%, transparent) !important;
+                stroke: color-mix(in oklab, var(--theme-foreground) 60%, transparent) !important;
+              }
+              .cluster rect { fill: transparent !important; stroke: var(--theme-separator) !important; }
+            `,
+          },
+        },
+      ],
+      rehypeStripMermaidFontface,
     ],
   },
 

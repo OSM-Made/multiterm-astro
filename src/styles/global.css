@@ -572,6 +572,10 @@ article img {
     @apply overflow-x-auto py-2 my-4;
   }
 
+  svg.flowchart {
+    @apply block mx-auto my-6;
+  }
+
   fieldset {
     @apply inline-block border-2 border-accent/80 p-2.5 rounded-xl;
   }
