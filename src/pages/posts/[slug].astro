@@ -13,6 +13,7 @@ import siteConfig from '~/site.config'
 import Tags from '~/components/Tags.astro'
 import PostInfo from '~/components/PostInfo.astro'
 import ScrollUpButton from '~/components/ScrollUpButton.astro'
+import MermaidLoader from '~/components/MermaidLoader.astro'
 import type { Collation } from '~/types'
 import ChevronsRight from '~/icons/chevrons-right.svg'
 import { getPostSequenceContext } from '~/utils'
@@ -151,4 +152,5 @@ if (postData.tags && postData.tags.length > 0) {
     )
   }
   <ScrollUpButton />
+  <MermaidLoader />
 </Layout>

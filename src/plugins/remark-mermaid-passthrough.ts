@@ -5,8 +5,8 @@ import { visit } from 'unist-util-visit'
 /**
  * Replaces ```mermaid fenced code blocks with a non-`code` mdast node so
  * astro-expressive-code (which only walks `code` nodes) ignores them.
- * The node still serializes to <pre><code class="language-mermaid">…</code></pre>
- * via data.hName / data.hChildren, so rehype-mermaid can pick it up later.
+ * Serializes to <pre class="mermaid">{source}</pre>, which the client-side
+ * mermaid loader picks up via mermaid.run().
  */
 const plugin: Plugin<[], Root> = () => (tree) => {
   visit(tree, 'code', (node, index, parent) => {
@@ -15,14 +15,8 @@ const plugin: Plugin<[], Root> = () => (tree) => {
       type: 'mermaidBlock',
       data: {
         hName: 'pre',
-        hChildren: [
-          {
-            type: 'element',
-            tagName: 'code',
-            properties: { className: ['language-mermaid'] },
-            children: [{ type: 'text', value: node.value }],
-          },
-        ],
+        hProperties: { className: ['mermaid'] },
+        hChildren: [{ type: 'text', value: node.value }],
       },
     } as never
   })

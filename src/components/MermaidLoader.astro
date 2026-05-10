@@ -1,0 +1,89 @@
+---
+
+---
+
+<script>
+  // rehype-mermaid (strategy: 'pre-mermaid') emits diagrams as
+  // <pre class="mermaid">{source}</pre>. We render them in the browser only when
+  // a page actually contains one, and re-render on theme change so colors that
+  // mermaid resolves at init time (not just CSS vars) update too.
+  const hasDiagram = () => document.querySelector('pre.mermaid') !== null
+
+  if (hasDiagram()) {
+    const { default: mermaid } = await import('mermaid')
+
+    const themeCSS = `
+      .node rect, .node polygon, .node circle, .node ellipse, .node path {
+        fill: color-mix(in oklab, var(--theme-foreground) 5%, transparent) !important;
+        stroke: var(--theme-accent) !important;
+        stroke-width: 1.5px !important;
+      }
+      .node .label, .nodeLabel, .nodeLabel p {
+        color: var(--theme-foreground) !important;
+        fill: var(--theme-foreground) !important;
+      }
+      .node foreignObject { overflow: visible !important; }
+      .node foreignObject > div {
+        display: inline-block !important;
+        position: relative !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: max-content !important;
+        max-width: none !important;
+        white-space: nowrap !important;
+      }
+      .nodeLabel, .nodeLabel p { white-space: nowrap !important; }
+      .edgePath .path, .flowchart-link {
+        stroke: color-mix(in oklab, var(--theme-foreground) 60%, transparent) !important;
+        stroke-width: 1.5px !important;
+      }
+      .edgeLabel, .edgeLabel p, .edgeLabel rect {
+        background-color: var(--theme-background) !important;
+        color: var(--theme-foreground) !important;
+        fill: var(--theme-background) !important;
+      }
+      .edgeLabel foreignObject div {
+        background-color: var(--theme-background) !important;
+        color: var(--theme-foreground) !important;
+      }
+      .arrowMarkerPath, marker path, defs path {
+        fill: color-mix(in oklab, var(--theme-foreground) 60%, transparent) !important;
+        stroke: color-mix(in oklab, var(--theme-foreground) 60%, transparent) !important;
+      }
+      .cluster rect { fill: transparent !important; stroke: var(--theme-separator) !important; }
+    `
+
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'strict',
+      theme: 'base',
+      flowchart: { padding: 16, wrappingWidth: 400 },
+      themeVariables: {
+        fontFamily: '"JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace',
+      },
+      themeCSS,
+    })
+
+    // Cache original source so we can re-render after theme switches.
+    document.querySelectorAll<HTMLPreElement>('pre.mermaid').forEach((pre) => {
+      pre.dataset.source ??= (pre.textContent ?? '').trim()
+    })
+
+    const render = async () => {
+      document.querySelectorAll<HTMLPreElement>('pre.mermaid').forEach((pre) => {
+        if (pre.dataset.source) {
+          pre.removeAttribute('data-processed')
+          pre.textContent = pre.dataset.source
+        }
+      })
+      await mermaid.run({ querySelector: 'pre.mermaid' })
+    }
+
+    await render()
+
+    // Re-render when the user toggles the theme.
+    new MutationObserver((muts) => {
+      if (muts.some((m) => m.attributeName === 'data-theme')) void render()
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] })
+  }
+</script>
