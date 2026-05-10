@@ -96,15 +96,18 @@ flowchart TD
   NPT --> HPA["Host Physical Address (HPA)"]
 ```
 
-```text
-Guest Controls:
-GVA → GPA
-
-Hypervisor Controls:
-GPA → HPA
-```
-
 The guest operating system still manages its own page tables normally and remains unaware that virtualization is occurring underneath it, while the hypervisor controls how Guest Physical Addresses map onto real system physical memory through the Nested Page Tables.
+
+```mermaid
+flowchart LR
+  subgraph Guest["Guest Controls"]
+    GVA["GVA"] --> GPA["GPA"]
+  end
+  subgraph Hyp["Hypervisor Controls"]
+    GPA2["GPA"] --> HPA["HPA"]
+  end
+  GPA ~~~ GPA2
+```
 
 Importantly, the NPT is not a 1:1 mirror of the guest page tables. The hypervisor doesn’t need to track how the guest organizes its virtual memory internally. Instead, the hypervisor primarily cares about controlling and protecting Guest Physical Address ranges and how they map onto real system memory.
 
