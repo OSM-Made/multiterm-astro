@@ -9,9 +9,7 @@ toc: true
 ## Introduction
 While experimenting with AMD SVM (Secure Virtual Machine) on the PS5, I noticed significant performance degradation when Nested Page Tables (NPT) were disabled. At the time, my original goal was simply to better understand the hypervisor environment and experiment with behavior that had been publicly discussed previously. Instead, I ended up stumbling into a much more interesting performance issue involving nested paging and memory translation behavior.
 
-What immediately stood out was that disabling NPT made games load from disc roughly 3x slower than with NPT enabled. This ended up sending me down a rabbit hole to better understand how guest-to-host physical address translation operates under AMD SVM and why the fallback behavior without hardware-assisted nested paging appeared substantially more expensive than I originally expected.
-
-This post covers the initial behavior I observed, the methodology I used while measuring it, and the changes that significantly improved the performance. Along the way, I learned quite a bit about how nested paging and memory translation actually operate on the PS5. I also want to use this post to cover some of the fundamentals behind AMD SVM paging, how Nested Page Tables differ from Shadow Page Tables, and why hardware-assisted nested translation is typically expected to perform substantially better.
+What immediately stood out was that disabling NPT made games load from disc roughly 3x slower than with NPT enabled. My working assumption was that the hypervisor was falling back to Shadow Page Tables under the hood, and that I was paying the well-known SPT bookkeeping overhead. That's the framing the first half of this post walks through. As I'll get into later, that assumption turned out to be wrong, but the general theory of how paging virtualization works is still worth covering on its own, and it's the foundation the technical half of this post builds on.
 
 ## Background: From Paging to Nested Paging
 
@@ -113,7 +111,44 @@ Importantly, the NPT is not a 1:1 mirror of the guest page tables. The hyperviso
 
 This significantly reduces the overhead traditionally associated with Shadow Page Tables (SPT), where the hypervisor is forced to actively maintain synchronized shadow mappings as the guest updates its own paging structures.
 
-Of course, the additional translation layer introduced by NPT is not free. In the worst case, a single memory access can require the processor to walk both the guest’s 4-level page tables and the hypervisor’s nested tables, requiring up to 24 memory accesses for one translation. This is why TLB efficiency matters so much under nested paging, and why what I observed when disabling NPT was unexpected.
+Of course, the additional translation layer introduced by NPT is not free. In the worst case, a single memory access can require the processor to walk both the guest’s 4-level page tables and the hypervisor’s nested tables, requiring up to 24 memory accesses for one translation. This is why TLB efficiency matters so much under nested paging.
+
+### Why NPT Is Usually Faster
+
+Despite the more expensive per-access walks, NPT typically wins on net once you account for what *not* using it would cost the hypervisor.
+
+Without hardware-assisted nested paging, the hypervisor must instead maintain Shadow Page Tables that effectively merge the guest's intended mappings with the hypervisor's own security restrictions into a single paging structure used by the processor.
+
+This introduces several expensive problems:
+- Guest page table modifications may require hypervisor intervention
+- Shadow mappings may need to be rebuilt or synchronized
+- TLB invalidation behavior becomes more expensive
+- Guest paging activity can generate significantly more virtualization overhead
+
+With NPT enabled, the processor is instead able to dynamically resolve both translation layers directly in hardware:
+
+```mermaid
+flowchart LR
+  GVA["GVA"] --> GPA["GPA"] --> HPA["HPA"]
+```
+
+While this does increase the cost of an individual page walk and TLB miss, it dramatically reduces the amount of active hypervisor synchronization required during normal execution.
+
+At a high level, the performance tradeoff between the two approaches looks roughly like this:
+
+```mermaid
+flowchart LR
+  subgraph SPT["Shadow Page Tables (SPT)"]
+    direction LR
+    S_cost["Heavy hypervisor bookkeeping<br/>on every guest page table change"] -- "buys" --> S_gain["Cheaper individual translations"]
+  end
+  subgraph NPT2["Nested Page Tables (NPT)"]
+    direction LR
+    N_cost["More expensive page walks<br/>(up to 24 memory accesses)"] -- "buys" --> N_gain["Minimal hypervisor synchronization<br/>during normal guest activity"]
+  end
+```
+
+That's the general theory, and it's why hardware-assisted nested paging displaced SPT as the standard approach to memory virtualization. With that as the foundation, what I observed when I disabled NPT on the PS5 was unexpected.
 
 ## Measuring the Performance Difference
 
@@ -172,71 +207,24 @@ flowchart LR
 
 This was the opposite of what I'd expected. Since NPT adds a translation layer, I'd assumed disabling it would *reduce* paging overhead, not triple it. That mismatch is what pushed me to dig further into how AMD SVM actually handles memory virtualization without nested paging.
 
-### Rethinking the Assumption
+## Incorrect Assumptions
 
-My original assumption focused too heavily on the additional translation layer introduced by Nested Page Tables themselves. Intuitively, adding another paging stage sounds like it should increase overhead due to additional page walks, TLB pressure, and translation complexity.
+Given the background above, the obvious conclusion to draw from a 3x slowdown when disabling NPT was that the hypervisor had fallen back to Shadow Page Tables. The mechanism would be the textbook one: with NPT off, the HV would have to maintain merged shadow mappings and rebuild them on every guest page-table modification, and the bookkeeping cost of that work would dominate the load-time path. A 3x ratio is in the ballpark of what published SPT-vs-NPT comparisons report on real workloads, so the conclusion felt clean.
 
-However, after spending more time understanding how AMD SVM handles memory virtualization, it became clear that the real advantage of NPT is not simply faster translations. The much larger benefit comes from avoiding the heavy synchronization and bookkeeping costs traditionally associated with Shadow Page Tables.
+It also matched my prior. I'd gone in expecting NPT to be the faster mode and the fallback to be slower, and the measurement appeared to confirm that.
 
-With Nested Paging enabled, the guest operating system remains free to manage its own virtual memory layout normally through its Guest Page Tables. The hypervisor only needs to manage the Guest Physical Address to Host Physical Address translation layer through the NPT structures.
+The research that followed proved the SPT-fallback assumption wrong, and the actual mechanism turned out to be more interesting than the bookkeeping story I'd been operating under.
 
-This separation significantly reduces the amount of hypervisor intervention required during normal guest memory management activity.
+## What I Actually Found
 
-### Why NPT Is Usually Faster
+The rest of this post is the technical walkthrough: static analysis of the hypervisor binary, dynamic testing, and the actual mechanism behind the slowdown.
 
-Without hardware-assisted nested paging, the hypervisor must instead maintain Shadow Page Tables that effectively merge the guest's intended mappings with the hypervisor's own security restrictions into a single paging structure used by the processor.
+<!-- TODO -->
 
-This introduces several expensive problems:
-- Guest page table modifications may require hypervisor intervention
-- Shadow mappings may need to be rebuilt or synchronized
-- TLB invalidation behavior becomes more expensive
-- Guest paging activity can generate significantly more virtualization overhead
-
-With NPT enabled, the processor is instead able to dynamically resolve both translation layers directly in hardware:
-
-```mermaid
-flowchart LR
-  GVA["GVA"] --> GPA["GPA"] --> HPA["HPA"]
-```
-
-While this does increase the cost of an individual page walk and TLB miss, it dramatically reduces the amount of active hypervisor synchronization required during normal execution.
-
-At a high level, the performance tradeoff between the two approaches looks roughly like this:
-
-```mermaid
-flowchart LR
-  subgraph SPT["Shadow Page Tables (SPT)"]
-    direction LR
-    S_cost["Heavy hypervisor bookkeeping<br/>on every guest page table change"] -- "buys" --> S_gain["Cheaper individual translations"]
-  end
-  subgraph NPT2["Nested Page Tables (NPT)"]
-    direction LR
-    N_cost["More expensive page walks<br/>(up to 24 memory accesses)"] -- "buys" --> N_gain["Minimal hypervisor synchronization<br/>during normal guest activity"]
-  end
-```
-
-At least from my current understanding, this appears to largely explain why disabling NPT resulted in substantially worse performance than I originally expected.
-
-:::note
-One caveat worth being upfront about: I haven't independently confirmed that flipping `NP_ENABLE` off causes the PS5 hypervisor to actually fall back to Shadow Page Tables. I'm assuming it does, since SPT is the natural fallback for AMD SVM without nested paging, but I haven't verified it. I also fully accept that the hypervisor clearly isn't designed to run in this mode. A hypervisor explicitly built around SPT could likely close some of the gap I'm observing here. The goal of this post isn't to claim the ~3x is some inherent SPT-vs-NPT ratio, just to share what I tested and what I observed.
-:::
-
-### Future Investigation
-
-While the high-level architectural reasoning behind the performance difference makes significantly more sense to me now, there are still a number of areas I want to investigate further.
-
-Some of the areas I am particularly interested in exploring further include:
-- TLB invalidation behavior
-- The exact Shadow Page Table implementation being used
-- VM exit frequency differences
-- Page walk amplification costs
-- Cache and translation behavior under heavier workloads
-
-The testing in this post was primarily focused on validating and reproducing the performance difference itself. I would like to spend more time building better instrumentation and testing methodologies to better understand exactly where the remaining overhead originates from in practice.
 
 ## References
 
 A lot of the speculation and architectural reasoning in this post is grounded in the following sources:
 
-- [AMD64 Architecture Programmer's Manual, Volume 2: System Programming](https://docs.amd.com/v/u/en-US/24593_3.44_APM_Vol2) — the canonical reference for AMD SVM, the VMCB layout, the `NP_ENABLE` bit, and how nested paging is supposed to behave at the hardware level. Most of what I claim about the mechanics of NPT comes from here.
-- [Performance Evaluation of AMD RVI Hardware Assist](https://www.cse.iitd.ernet.in/~sbansal/csl862-virt/2010/readings/RVI_performance.pdf) — an older AMD-authored paper covering the original SVM/RVI (Rapid Virtualization Indexing, the marketing name for NPT) performance characteristics versus shadow paging. It's dated and describes much earlier hardware, so I wouldn't lean on its specific numbers, but it was useful background for understanding the SPT-vs-NPT tradeoff at a conceptual level.
+- [AMD64 Architecture Programmer's Manual, Volume 2: System Programming](https://docs.amd.com/v/u/en-US/24593_3.44_APM_Vol2): the canonical reference for AMD SVM, the VMCB layout, the `NP_ENABLE` bit, and how nested paging is supposed to behave at the hardware level. Most of what I claim about the mechanics of NPT comes from here.
+- [Performance Evaluation of AMD RVI Hardware Assist](https://www.cse.iitd.ernet.in/~sbansal/csl862-virt/2010/readings/RVI_performance.pdf): an older AMD-authored paper covering the original SVM/RVI (Rapid Virtualization Indexing, the marketing name for NPT) performance characteristics versus shadow paging. It's dated and describes much earlier hardware, so I wouldn't lean on its specific numbers, but it was useful background for understanding the SPT-vs-NPT tradeoff at a conceptual level.
