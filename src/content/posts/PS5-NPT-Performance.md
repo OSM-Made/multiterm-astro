@@ -6,9 +6,6 @@ tags: [ 'PS5', 'AMD SVM', 'Hypervisor', 'NPT', 'Reverse Engineering', 'Performan
 toc: true
 ---
 
-import nptOn from './NPT-ON.mp4'
-import nptOff from './NPT-OFF.mp4'
-
 ## Introduction
 While experimenting with AMD SVM (Secure Virtual Machine) on the PS5, I noticed significant performance degradation when Nested Page Tables (NPT) were disabled. At the time, my original goal was simply to better understand the hypervisor environment and experiment with behavior that had been publicly discussed previously. Instead, I ended up stumbling into a much more interesting performance issue involving nested paging and memory translation behavior.
 
@@ -151,14 +148,13 @@ This is admittedly a rough methodology. It's good enough for the order-of-magnit
 
 *Ghosts* loaded in roughly the time I'd expect with NPT on, and took about **3x longer** with NPT off across a handful of runs (eyeballed, not formally averaged). Both runs are shown side-by-side below.
 
-{/* TODO: drop NPT-fast.mp4 next to index.mdx, add `import nptFast from './NPT-fast.mp4'` up top, then swap the left video's src to {nptFast} */}
 <div class="flex flex-col md:flex-row gap-4 my-4">
   <figure class="flex-1 m-0">
-    <video controls preload="metadata" src={nptOn} class="w-full"></video>
+    <iframe class="w-full aspect-video" src="https://www.youtube.com/embed/DbRvQz9d1Y8?si=YkK1MVgTv-74_yKi&controls=0&modestbranding=1&rel=0&playsinline=1" title="PS5 game load with NPT on" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     <figcaption class="text-center text-sm mt-2">NPT On (~10s)</figcaption>
   </figure>
   <figure class="flex-1 m-0">
-    <video controls preload="metadata" src={nptOff} class="w-full"></video>
+    <iframe class="w-full aspect-video" src="https://www.youtube.com/embed/ShcJkdp7LZk?si=mwMPvTAH7GuuYtuf&controls=0&modestbranding=1&rel=0&playsinline=1" title="PS5 game load with NPT off" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     <figcaption class="text-center text-sm mt-2">NPT Off (~30s)</figcaption>
   </figure>
 </div>
